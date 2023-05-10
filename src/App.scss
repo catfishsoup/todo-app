@@ -1,0 +1,113 @@
+
+@import url('https://fonts.googleapis.com/css2?family=Gamja+Flower&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Asap&display=swap');
+
+$header-font: 'Gamja Flower', cursive;
+$body-font: 'Asap', sans-serif;
+$box-shadow: 10px 10px 67px -30px rgba(0,0,0,0.75);
+$body-color: rgba(0, 0, 0, 0.7); 
+
+@mixin theme($theme: greenGradient) {
+    background: linear-gradient(0deg, rgba(34,193,195,1) 0%, rgba(253,187,45,1) 100%);
+    background-repeat: no-repeat;
+    height: 100vh;
+}
+
+@mixin glass($theme: glassBG) {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 16px;
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(5px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+@mixin text-box($theme: neutral) {
+  font-family: $body-font;
+  color: $body-color;
+  background: linear-gradient(
+    to right top,
+    rgba(255, 255, 255, 0.8),
+    rgba(255, 255, 255, 0.75)
+  );
+  border-radius: 5px;
+  margin: 1em;
+  box-shadow: $box-shadow;
+}
+
+
+
+// 
+
+*:focus {
+  outline: none;
+}
+body {
+  @include theme($theme: greenGradient);
+  font-family: $body-font;
+}
+
+.container {
+  @include glass($theme: glassBG);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: white;
+  flex-direction: column;
+  padding: 2em;
+  margin: 1em;
+}
+
+.title {
+  display: block;
+  font-size: 3em;
+  font-family: $header-font;
+  
+}
+
+.input-box {
+  @include text-box($theme: neutral);
+  padding: 1.5em;
+  border: none;
+  min-width: 75ch;
+}
+
+.note-box {
+  @include text-box($theme: neutral);
+  padding: 1em;
+  width: 100ch;
+  display: inline-block;
+  transition: 0.5s;
+  position: relative;
+}
+
+.note-box:hover {
+  background: linear-gradient(
+    to right top,
+    rgba(255, 255, 255, 1),
+    rgba(255, 255, 255, 0.85)
+  );
+}
+
+.add-btn {
+  padding: 1em;
+  border: none;
+  background: linear-gradient(0deg, rgba(34,193,195,1) 0%, rgba(253,187,45,1) 100%);
+  background-repeat: 300% 400%;
+  border-radius: 5px;
+  color: white;
+  box-shadow: $box-shadow;
+  transition: 0.5s;
+}
+
+.add-btn:hover {
+  transform: scale(1.2);
+}
+
+.del-btn {
+  position: absolute;
+  right: 10px;
+}
+input[type="checkbox"] {
+  border: 2px solid red;
+  margin-right: 1em;
+}
