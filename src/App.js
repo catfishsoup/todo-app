@@ -1,6 +1,6 @@
 import './App.scss'
-import { useState } from 'react'
-
+import React, { useState, useRef } from 'react'
+import trashbin from './trashbin.svg'
 
 const Title = ({name}) => {
   return (
@@ -17,23 +17,38 @@ const Note = ({input, handleInputChange, addNote}) => {
     </div>
   )
 }
-const List = ({input, deleteNote}) => {
+
+
+
+const List = ({input, deleteNote, crossNote, labelRef, editdisable}) => {
   return (
     <>
     {input.map((note => <div key={note.id} className="note-box">
-      <input type="checkbox" className="check-box"/>
-      <span contentEditable="true" suppressContentEditableWarning={true} className="todo-text">{note.value}</span>
-      <button onClick={() => deleteNote(note.value)} className="del-btn">Delete</button>
+      <input type="checkbox" className="check-box" onClick={() => crossNote({editdisable})}/>
+      <span contentEditable="true" suppressContentEditableWarning={true} className="todo-text" ref={labelRef} spellcheck="false">{note.value}</span>
+      <button onClick={() => deleteNote(note.value)} className="del-btn"><img src={trashbin}/></button>
       </div>))}
     </>
     
   )
 }
+
+const Count = ({noteCount, completeNote}) => {
+  return (
+    <>
+      <div>{completeNote} out of {noteCount} task completed</div>    
+    </>
+  )
+}
+
 const App = () => {
 
   const [input, setInput] = useState('')
+  const [countNote, setcountNote] = useState(0)
+  const [completeNote, setcompleteNote] = useState(0)
   const [notes, setNotes] = useState([])
-
+  let ref = React.createRef()
+  const [checked, setChecked] = useState(false) 
 
   const handleInputChange = (e) => {
     setInput(e.target.value)
@@ -44,9 +59,11 @@ const App = () => {
     if(input !== '') {
       const noteObject = {
         value: input, 
-        id: notes.length + 1
+        id: notes.length + 1,
+        checked: false 
       }
       setNotes([...notes, noteObject])
+      setcountNote(countNote + 1)
     } else {
       alert('Cannot enter empty string')
     }
@@ -58,14 +75,26 @@ const App = () => {
       setNotes(notes.filter(note => note.value !== currentnote))
   }
 
-  const editNote = (e) => {
-    e.preventDefault()
+  const crossNote = () => {
+    if(checked === false) {
+      ref.current.style.textDecoration = 'line-through'
+      setcompleteNote(completeNote + 1 )
+    } else {
+      ref.current.style.textDecoration = 'none'
+      setcompleteNote(completeNote - 1 )
+    }
+
+    setChecked(!checked)
   }
+
+
   return(
     <div className="container">
     <Title name="Let's get things done today!"/>
     <Note input={input} handleInputChange={handleInputChange} addNote={addNote}/>
-    <List input={notes} deleteNote={delNote}/>
+    {/* Passing ref into the List components, then using it to access in the main component  */}
+    <List input={notes} deleteNote={delNote} crossNote={crossNote} labelRef={ref}/>
+    <Count noteCount={countNote} completeNote={completeNote}/>
   </div>
   )
   
