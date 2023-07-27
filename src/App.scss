@@ -65,11 +65,16 @@ body {
   font-family: $header-font;
   
 }
-
+.test {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
 .input-box {
   @include text-box($theme: neutral);
   padding: 1.5em;
   border: none;
+  display: inline-block;
   min-width: 75ch;
 }
 
@@ -93,6 +98,7 @@ body {
 .add-btn {
   padding: 1em;
   border: none;
+  display: inline-block;
   background: $main-gradient;
   background-repeat: 300% 400%;
   border-radius: 5px;
@@ -117,4 +123,9 @@ body {
 input[type="checkbox"] {
   border: 2px solid red;
   margin-right: 1em;
+}
+
+
+.todo-text-crossed {
+  text-decoration: line-through;
 }
