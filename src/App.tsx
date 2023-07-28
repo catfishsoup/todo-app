@@ -1,105 +1,115 @@
-import './App.scss'
-import React, { useState } from 'react'
-import trashbin from './trashbin.svg'
-import { v4 as uuidv4 } from 'uuid';
-const Title = ({name}) => {
+import "./App.scss";
+import React, { useState, createContext, useContext, useEffect } from "react";
+import { v4 as uuidv4 } from "uuid";
+import { useAppSelector, useAppDispatch } from "./redux/hooks";
+import { addNote } from "./redux/reducer";
+
+const Note = () => {
+  const dispatch = useAppDispatch();
+  const [input, setInput] = useState("");
+
+  const handleAddTodo = () => {
+    if (input !== "") {
+      dispatch(addNote({ value: input, id: uuidv4(), checked: false }));
+    }
+
+    setInput("");
+    console.log("done");
+  };
   return (
-    <div className="title">
-    <h1>{name}</h1>
-    </div>
-  )
-}
-
-const Note = ({input, handleInputChange, addNote}) => {
-    return (
-      <div className="test">
-        <div><input placeholder="Enter a task" value={input} type="text" onChange={handleInputChange} className="input-box"/></div> 
-        <button onClick={addNote} type="submit" className="add-btn">+</button>
+    <div className="test">
+      <div>
+        <input
+          placeholder="Enter a task"
+          value={input}
+          type="text"
+          onChange={(e) => setInput(e.target.value)}
+          className="input-box"
+        />
       </div>
-      
-    )
-  }
+      <button type="submit" className="add-btn" onClick={() => handleAddTodo()}>
+        +
+      </button>
+    </div>
+  );
+};
 
-  const List = ({input, deleteNote, crossNote}) => {
-    return (
-      <>
-      {input.map((note => <div key={note.id} className="note-box">
-        <input type="checkbox" className="check-box" onClick={() => crossNote(note)}/>
-        <span contentEditable="true" suppressContentEditableWarning={true} className={note.checked === true ? "todo-text-crossed" : "todo-text"} spellCheck="false"> {note.value}</span>
-        <button onClick={() => deleteNote(note)} className="del-btn"><img src={trashbin} alt="trashbin-icon"/></button>
-        </div>))}
-      </>
-      
-    )
-  }
-  
-  const Count = ({noteCount, completeNote}) => {
-    return (
-      <>
-        <small className="note-tracker"> {completeNote} out of {noteCount} task completed</small>    
-      </>
-    )
-  }
+const List = () => {
+  let notes  = useAppSelector((state) => state.todo);
+
+  // useEffect(() => {
+  //   setNotes(useAppSelector(state => state.todo))
+  // }, [notes])
+  return (
+    <>
+      {notes.map((note) => (
+        <div key={note.id} className="note-box">
+          <input type="checkbox" className="check-box" />
+          <span
+            contentEditable="true"
+            suppressContentEditableWarning={true}
+            className={
+              note.checked === true ? "todo-text-crossed" : "todo-text"
+            }
+            spellCheck="false"
+          >
+            {" "}
+            {note.value}
+          </span>
+          <button className="del-btn">
+            <img
+              src={require("./trashbin.svg")}
+              alt="trashbin-icon"
+            />
+          </button>
+        </div>
+      ))}
+    </>
+  );
+};
+
+//   const Count = ({complete, total}: tracker) => {
+//     return (
+//       <>
+//         <small className="note-tracker"> {complete} out of {total} task completed</small>
+//       </>
+//     )
+//   }
 
 const App = () => {
+  // const delNote = (note: noteObject) => {
+  //       const currentnote = note;
+  //       // Return a new array that doesn't have the current note.
+  //       setNotes(notes.filter(note => note !== currentnote))
+  //       setcountNote(countNote - 1)
+  //       if(completeNote >= 1) {
+  //         setcompleteNote(completeNote - 1)
+  //       }
+  //   }
 
-  const [input, setInput] = useState('')
-  const [countNote, setcountNote] = useState(0)
-  const [completeNote, setcompleteNote] = useState(0)
-  const [notes, setNotes] = useState([])
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setInput(e.target.value)
-  }
+  //  const crossNote = (currNote: noteObject) => {
+  //   let array = notes.map(crossNote => {
+  //     if(crossNote.id === currNote.id) {
+  //       return {...crossNote, checked: !crossNote.checked}
+  //     }
+  //     return crossNote
+  //   })
+  //   setNotes(array)
+  //   if(currNote.checked === false) {
+  //     setcompleteNote(completeNote + 1)
+  //   } else {setcompleteNote(completeNote - 1)}
+  //  }
 
-  const addNote = (e: React.ChangeEvent<HTMLInputElement>) => {
-    e.preventDefault()
-      const noteObject = {
-        value: input, 
-        id: uuidv4(),
-        checked: false
-      }
-      setNotes([...notes, noteObject])
-      setcountNote(countNote + 1)
-    setInput('')
-  }
+  return (
+    <main className="container">
+       <div className="title">
+      <h1>Let's get things done today</h1>
+    </div>
+      <Note />
+      <List />
+      {/*<Count complete={countNote} total={completeNote}/> */}
+    </main>
+  );
+};
 
-
-  const delNote = (note) => {
-      const currentnote = note;
-      // Return a new array that doesn't have the current note. 
-      setNotes(notes.filter(note => note !== currentnote))
-      setcountNote(countNote - 1)
-      if(completeNote >= 1) {
-        setcompleteNote(completeNote - 1)
-      }
-  }
-
- const crossNote = (currNote) => {
-  let array = notes.map(crossNote => {
-    if(crossNote.id === currNote.id) {
-      return {...crossNote, checked: !crossNote.checked}
-    }
-    return crossNote
-  })
-  setNotes(array)
-  if(currNote.checked === false) {
-    setcompleteNote(completeNote + 1)
-  } else {setcompleteNote(completeNote - 1)}
- }
-
-
-  return(
-    <div className="container">
-    <Title name="Let's get things done today!"/>
-    <Note input={input} handleInputChange={handleInputChange} addNote={addNote}/>
-    {/* Passing ref into the List components, then using it to access in the main component  */}
-    <List input={notes} deleteNote={delNote} crossNote={crossNote}/>
-    <Count noteCount={countNote} completeNote={completeNote}/>
-  </div>
-  )
-  
-}
-  
-
-
-export default App
+export default App;
