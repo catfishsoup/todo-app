@@ -1,8 +1,22 @@
 import "./App.scss";
-import React, { useState, createContext, useContext, useEffect } from "react";
+import React, { useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { useAppSelector, useAppDispatch } from "./redux/hooks";
-import { addNote } from "./redux/reducer";
+import { addNote, deleteNote, crossNote } from "./redux/reducer";
+import { subtract, add } from "./redux/count_reducer";
+
+const App = () => {
+  return (
+    <main className="container">
+      <div className="title">
+        <h1>Let's get things done today</h1>
+      </div>
+      <Note/>
+      <List/>
+      <Count/>
+    </main>
+  );
+};
 
 const Note = () => {
   const dispatch = useAppDispatch();
@@ -11,10 +25,9 @@ const Note = () => {
   const handleAddTodo = () => {
     if (input !== "") {
       dispatch(addNote({ value: input, id: uuidv4(), checked: false }));
+      dispatch(add())
     }
-
     setInput("");
-    console.log("done");
   };
   return (
     <div className="test">
@@ -35,16 +48,22 @@ const Note = () => {
 };
 
 const List = () => {
-  let notes  = useAppSelector((state) => state.todo);
+  let notes = useAppSelector((state) => state.todo);
+  const dispatch = useAppDispatch();
+  const trashbin: string = require("./trashbin.svg").default;
 
-  // useEffect(() => {
-  //   setNotes(useAppSelector(state => state.todo))
-  // }, [notes])
+  const reduceNote = () => {
+    dispatch(subtract())
+  }
   return (
     <>
       {notes.map((note) => (
         <div key={note.id} className="note-box">
-          <input type="checkbox" className="check-box" />
+          <input
+            type="checkbox"
+            className="check-box"
+            onClick={() => {dispatch(crossNote(note)); reduceNote()}}
+          />
           <span
             contentEditable="true"
             suppressContentEditableWarning={true}
@@ -56,11 +75,11 @@ const List = () => {
             {" "}
             {note.value}
           </span>
-          <button className="del-btn">
-            <img
-              src={require("./trashbin.svg")}
-              alt="trashbin-icon"
-            />
+          <button
+            className="del-btn"
+            onClick={() => dispatch(deleteNote(note.id))}
+          >
+            <img src={trashbin} alt="trashbin-icon" />
           </button>
         </div>
       ))}
@@ -68,48 +87,16 @@ const List = () => {
   );
 };
 
-//   const Count = ({complete, total}: tracker) => {
-//     return (
-//       <>
-//         <small className="note-tracker"> {complete} out of {total} task completed</small>
-//       </>
-//     )
-//   }
-
-const App = () => {
-  // const delNote = (note: noteObject) => {
-  //       const currentnote = note;
-  //       // Return a new array that doesn't have the current note.
-  //       setNotes(notes.filter(note => note !== currentnote))
-  //       setcountNote(countNote - 1)
-  //       if(completeNote >= 1) {
-  //         setcompleteNote(completeNote - 1)
-  //       }
-  //   }
-
-  //  const crossNote = (currNote: noteObject) => {
-  //   let array = notes.map(crossNote => {
-  //     if(crossNote.id === currNote.id) {
-  //       return {...crossNote, checked: !crossNote.checked}
-  //     }
-  //     return crossNote
-  //   })
-  //   setNotes(array)
-  //   if(currNote.checked === false) {
-  //     setcompleteNote(completeNote + 1)
-  //   } else {setcompleteNote(completeNote - 1)}
-  //  }
-
+const Count = () => {
+  let ongoing = useAppSelector((state) => state.count.ongoing);
+  let finish = useAppSelector((state) => state.count.complete);
   return (
-    <main className="container">
-       <div className="title">
-      <h1>Let's get things done today</h1>
-    </div>
-      <Note />
-      <List />
-      {/*<Count complete={countNote} total={completeNote}/> */}
-    </main>
+    <>
+      <small className="note-tracker">
+        {" "}
+        {finish} out of {ongoing} task completed
+      </small>
+    </>
   );
 };
-
 export default App;

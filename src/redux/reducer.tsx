@@ -1,5 +1,4 @@
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
-import { v4 as uuidv4 } from "uuid";
 
 //Setting the notes structure
 interface noteObject {
@@ -21,11 +20,23 @@ const todosSlice = createSlice({
       action.payload,
     ],
     
-    deleteNote: (state, action: PayloadAction<noteObject>) =>
-      state.filter((note) => note !== action.payload),
+    deleteNote: (state, action: PayloadAction<string>) =>
+      state.filter(note => note.id !== action.payload), 
+      
+    crossNote: (state, action: PayloadAction<noteObject>) => 
+      state.map((note) => {
+        if(note.id === action.payload.id) {
+          console.log('check?', action.payload)
+          return {...note, checked: !action.payload.checked}
+        }
+        return note
+      })
+    
+    
   },
 });
 
 
-export const {addNote, deleteNote} = todosSlice.actions;
+//Exporting individually
+export const {addNote, deleteNote, crossNote} = todosSlice.actions;
 export default todosSlice.reducer; 
